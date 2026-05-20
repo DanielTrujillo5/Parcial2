@@ -2,7 +2,7 @@ import { http } from "./http";
 
 import type { ApiResponse } from "../types/api";
 
-import type { Ticket } from "../types/ticket";
+import type { Ticket, CreateTicketRequest } from "../types/ticket";
 
 export const ticketsApi = {
 
@@ -14,6 +14,11 @@ export const ticketsApi = {
 
     return response.data;
 
+  },
+
+  create: async (data: CreateTicketRequest) => {
+    const response = await http<ApiResponse<Ticket>>("/tickets", "POST", data);
+    return response.data;
   },
 
 };

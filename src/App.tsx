@@ -11,6 +11,8 @@ import HomePage from "./pages/HomePage";
 
 import TicketsPage from "./pages/TicketsPage";
 
+import CrearTicketPage from "./pages/CrearTicketPage";
+
 import PrivateRoute from "./components/PrivateRoute";
 
 import { useAuth } from "./context/AuthContext";
@@ -46,6 +48,15 @@ function AppRoutes() {
         element={
           <PrivateRoute>
             <TicketsPage />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/tickets/crear"
+        element={
+          <PrivateRoute>
+            <CrearTicketPage />
           </PrivateRoute>
         }
       />

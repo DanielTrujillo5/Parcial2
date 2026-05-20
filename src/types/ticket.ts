@@ -31,3 +31,10 @@ export interface Ticket {
   closedAt: string;
 
 }
+
+export interface CreateTicketRequest {
+  titulo: string;
+  descripcion: string;
+  prioridad: string;
+  categoriaId?: number;
+}

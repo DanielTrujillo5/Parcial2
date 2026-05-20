@@ -1,62 +1,159 @@
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
-import { useAuth } from "../context/AuthContext";
+import MainLayout from "../layouts/MainLayout";
+
+import { useTickets } from "../api/tickets.queries";
+import { useCategorias } from "../api/categorias.queries";
 
 export default function TicketsPage() {
 
-  const { user, logout } = useAuth();
+  const { data: tickets, isLoading, error } = useTickets();
+  const { data: categorias } = useCategorias();
 
-  const navigate = useNavigate();
+  const [search, setSearch] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
+
+  const filteredTickets = tickets?.filter((ticket) => {
+    const matchesSearch = ticket.titulo
+      .toLowerCase()
+      .includes(search.toLowerCase());
+    const matchesCategory =
+      !selectedCategory ||
+      ticket.categoriaId === Number(selectedCategory);
+    return matchesSearch && matchesCategory;
+  });
 
   return (
 
-    <div className="min-h-screen bg-slate-900 text-white p-8">
+    <MainLayout>
 
-      <div className="flex justify-between items-center mb-8">
+      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-8">
 
-        <div>
+        <div className="flex justify-between items-center mb-8">
 
-          <h1 className="text-3xl font-bold">
-            Sistema de Tickets
+          <h1 className="text-4xl font-bold">
+            Listado Tickets
           </h1>
 
-          <p className="text-slate-400 mt-2">
-            Bienvenido {user?.username}
-          </p>
+          <div className="flex gap-4">
 
-          <p className="text-slate-400">
-            Rol: {user?.role}
-          </p>
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="bg-slate-800 border border-slate-700 p-3 rounded-xl text-white"
+            >
+              <option value="">
+                Todas las categorías
+              </option>
+              {categorias?.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.nombre}
+                </option>
+              ))}
+            </select>
+
+            <input
+              type="text"
+              placeholder="Buscar ticket..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="bg-slate-800 border border-slate-700 p-3 rounded-xl text-white w-72"
+            />
+
+          </div>
 
         </div>
 
-        <button
-          onClick={() => {
+        {isLoading && (
+          <p>Cargando tickets...</p>
+        )}
 
-            logout();
+        {error && (
+          <p>Error cargando tickets</p>
+        )}
 
-            navigate("/login");
+        <div className="overflow-x-auto">
 
-          }}
-          className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded"
-        >
-          Logout
-        </button>
+          <table className="w-full">
+
+            <thead>
+
+              <tr className="border-b border-slate-800 text-slate-400">
+
+                <th className="text-left p-4">
+                  Título
+                </th>
+
+                <th className="text-left p-4">
+                  Estado
+                </th>
+
+                <th className="text-left p-4">
+                  Prioridad
+                </th>
+
+                <th className="text-left p-4">
+                  Categoría
+                </th>
+
+                <th className="text-left p-4">
+                  Usuario Asignado
+                </th>
+
+                <th className="text-left p-4">
+                  Fecha
+                </th>
+
+              </tr>
+
+            </thead>
+
+            <tbody>
+
+              {filteredTickets?.map((ticket) => (
+
+                <tr
+                  key={ticket.id}
+                  className="border-b border-slate-800 hover:bg-slate-800/40 transition"
+                >
+
+                  <td className="p-4 font-medium">
+                    {ticket.titulo}
+                  </td>
+
+                  <td className="p-4">
+                    {ticket.status}
+                  </td>
+
+                  <td className="p-4">
+                    {ticket.prioridad}
+                  </td>
+
+                  <td className="p-4">
+                    {ticket.categoriaNombre}
+                  </td>
+
+                  <td className="p-4">
+                    {ticket.asignadoAUsername || "Sin asignar"}
+                  </td>
+
+                  <td className="p-4">
+                    {new Date(ticket.createdAt)
+                      .toLocaleDateString()}
+                  </td>
+
+                </tr>
+
+              ))}
+
+            </tbody>
+
+          </table>
+
+        </div>
 
       </div>
 
-      <div className="bg-slate-800 p-6 rounded-xl">
-
-        <h2 className="text-2xl font-bold mb-4">
-          Ruta Protegida
-        </h2>
-
-        <p>
-          Solo usuarios autenticados pueden ver esta página.
-        </p>
-
-      </div>
-
-    </div>
+    </MainLayout>
   );
 }

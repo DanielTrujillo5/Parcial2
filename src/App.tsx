@@ -6,14 +6,21 @@ import {
 } from "react-router-dom";
 
 import LoginPage from "./pages/LoginPage";
+
+import HomePage from "./pages/HomePage";
+
 import TicketsPage from "./pages/TicketsPage";
+
 import PrivateRoute from "./components/PrivateRoute";
+
 import { useAuth } from "./context/AuthContext";
 
 function AppRoutes() {
+
   const { token } = useAuth();
 
   return (
+
     <Routes>
 
       <Route
@@ -27,6 +34,15 @@ function AppRoutes() {
 
       <Route
         path="/inicio"
+        element={
+          <PrivateRoute>
+            <HomePage />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/tickets"
         element={
           <PrivateRoute>
             <TicketsPage />
@@ -49,10 +65,13 @@ function AppRoutes() {
 }
 
 function App() {
+
   return (
+
     <BrowserRouter>
       <AppRoutes />
     </BrowserRouter>
+
   );
 }
 
